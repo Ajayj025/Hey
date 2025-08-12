@@ -1,33 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
+import { useNavigate } from "react-router-dom";
 
-export default function Contacts({ contacts, changeChat }) {
+export default function Contacts({ contacts, changeChat, closeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
+  const [showLogout, setShowLogout] = useState(false); // 👈 added
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(contacts)
-    const fetchUserData = async () => {
-      try {
-        const stored = localStorage.getItem("chat-app-user");
-        if (stored) {
-          const data = JSON.parse(stored);
-          setCurrentUserName(data.username);
-          setCurrentUserImage(data.avatarImage);
-        }
-      } catch (err) {
-        console.error("Error loading user from localStorage:", err);
-      }
+    const fetchData = async () => {
+      const data = await JSON.parse(localStorage.getItem("chat-app-user"));
+      setCurrentUserName(data.username);
+      setCurrentUserImage(data.avatarImage);
     };
-
-    fetchUserData();
+    fetchData();
   }, []);
 
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
     changeChat(contact);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
   };
 
   return (
@@ -36,7 +35,7 @@ export default function Contacts({ contacts, changeChat }) {
         <Container>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h3>Hey</h3>
+            <h3>HEY</h3>
           </div>
           <div className="contacts">
             {contacts.map((contact, index) => (
@@ -44,11 +43,12 @@ export default function Contacts({ contacts, changeChat }) {
                 key={contact._id}
                 className={`contact ${index === currentSelected ? "selected" : ""}`}
                 onClick={() => changeCurrentChat(index, contact)}
+                onDoubleClick={() => closeChat()}
               >
                 <div className="avatar">
                   <img
                     src={`data:image/svg+xml;base64,${contact.avatarImage}`}
-                    alt="avatar"
+                    alt=""
                   />
                 </div>
                 <div className="username">
@@ -57,7 +57,12 @@ export default function Contacts({ contacts, changeChat }) {
               </div>
             ))}
           </div>
-          <div className="current-user">
+
+          <div
+            className="current-user"
+            onClick={() => setShowLogout((prev) => !prev)}
+            style={{ cursor: "pointer" }}
+          >
             <div className="avatar">
               <img
                 src={`data:image/svg+xml;base64,${currentUserImage}`}
@@ -68,6 +73,12 @@ export default function Contacts({ contacts, changeChat }) {
               <h2>{currentUserName}</h2>
             </div>
           </div>
+
+          {showLogout && (
+            <div className="logout">
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          )}
         </Container>
       )}
     </>
@@ -76,9 +87,10 @@ export default function Contacts({ contacts, changeChat }) {
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 75% 15%;
+  grid-template-rows: 10% 70% auto auto;
   overflow: hidden;
   background-color: #080420;
+
   .brand {
     display: flex;
     align-items: center;
@@ -92,6 +104,7 @@ const Container = styled.div`
       text-transform: uppercase;
     }
   }
+
   .contacts {
     display: flex;
     flex-direction: column;
@@ -106,6 +119,7 @@ const Container = styled.div`
         border-radius: 1rem;
       }
     }
+
     .contact {
       background-color: #ffffff34;
       min-height: 5rem;
@@ -128,6 +142,7 @@ const Container = styled.div`
         }
       }
     }
+
     .selected {
       background-color: #9a86f3;
     }
@@ -139,6 +154,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     gap: 2rem;
+    padding: 0.5rem;
     .avatar {
       img {
         height: 4rem;
@@ -150,12 +166,33 @@ const Container = styled.div`
         color: white;
       }
     }
+
     @media screen and (min-width: 720px) and (max-width: 1080px) {
       gap: 0.5rem;
       .username {
         h2 {
           font-size: 1rem;
         }
+      }
+    }
+  }
+
+  .logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.3rem 0;
+    button {
+      padding: 0.5rem 1.2rem;
+      background-color: #9a86f3;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: 0.3s ease-in-out;
+      &:hover {
+        background-color: #7f6ce2;
       }
     }
   }

@@ -1,34 +1,33 @@
-import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { allUsersRoute, host } from "../utils/APIRoutes";
+import Welcome from "../components/Welcome";
 import ChatContainer from "../components/ChatContainer";
 import Contacts from "../components/Contacts";
-import Welcome from "../components/Welcome";
+import { useNavigate } from "react-router-dom";
+import { allUsersRoute, host } from "../utils/APIRoutes";
+import axios from "axios";
+import { io } from "socket.io-client";
 
 export default function Chat() {
   const navigate = useNavigate();
-  const socket = useRef();
+  const socket = React.useRef();
   const [contacts, setContacts] = useState([]);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load current user from localStorage on first render
   useEffect(() => {
     const fetchUser = async () => {
-      const userData = localStorage.getItem("chat-app-user");
-      if (!userData) {
+      if (!localStorage.getItem("chat-app-user")) {
         navigate("/login");
       } else {
-        setCurrentUser(await JSON.parse(userData));
+        setCurrentUser(await JSON.parse(localStorage.getItem("chat-app-user")));
+        setIsLoaded(true);
       }
     };
     fetchUser();
-  }, [navigate]);
+  }, []);
 
-  // Connect to socket after currentUser is set
   useEffect(() => {
     if (currentUser) {
       socket.current = io(host);
@@ -36,35 +35,42 @@ export default function Chat() {
     }
   }, [currentUser]);
 
-  // Load contacts once currentUser is available
   useEffect(() => {
     const fetchContacts = async () => {
       if (currentUser) {
-        if (currentUser.isAvatarImageSet ) {
-          const { data } = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-          setContacts(data);
+        if (currentUser.isAvatarImageSet) {
+          const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+          setContacts(data.data);
         } else {
           navigate("/setAvatar");
         }
       }
     };
     fetchContacts();
-  }, [currentUser, navigate]);
+  }, [currentUser]);
 
-  // Handle chat switch
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
   };
 
+  const handleCloseChat = () => {
+    setCurrentChat(undefined); 
+  };
 
   return (
     <Container>
       <div className="container">
-        <Contacts contacts={contacts} changeChat={handleChatChange} />
-        {currentChat ? (
-          <ChatContainer currentChat={currentChat} socket={socket} />
-        ) : (
+        <Contacts
+          contacts={contacts}
+          changeChat={handleChatChange}
+          closeChat={handleCloseChat} 
+        />
+        {isLoaded && currentChat === undefined ? (
           <Welcome />
+        ) : (
+          currentChat && (
+            <ChatContainer currentChat={currentChat} socket={socket} />
+          )
         )}
       </div>
     </Container>
