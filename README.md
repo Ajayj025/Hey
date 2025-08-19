@@ -13,7 +13,6 @@ It supports direct messaging, AI message enhancements, translations, topic summa
 - **Toxicity/Sentiment Detection** – Alerts or filters inappropriate messages.
 - **Language Translator** – Translate chats into different languages instantly.
 - **Emoji Support** – Express yourself with emojis.
-- **Secure Authentication** – User login & signup using JWT.
 - **Responsive UI** – Works seamlessly on desktop and mobile.
 
 ---
@@ -24,7 +23,7 @@ It supports direct messaging, AI message enhancements, translations, topic summa
 **Real-Time Communication:** Socket.io  
 **AI Features:** OpenRouter AI API integration  
 **Database:** MongoDB (with Mongoose)  
-**Authentication:** JWT-based login system
+**Authentication:** React based intutive login system
 
 ---
 
@@ -32,8 +31,8 @@ It supports direct messaging, AI message enhancements, translations, topic summa
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YourUsername/YourRepoName.git
-   cd YourRepoName
+   git clone https://github.com/Hey/Hey.git
+   cd Hey
 Install dependencies
 
 For server:
@@ -51,7 +50,7 @@ Create a .env file in the server folder and add:
 
 env:
 MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
+localhost:your_localhost
 OPENROUTER_API_KEY=your_openrouter_api_key
 
 Start the app
@@ -78,6 +77,7 @@ React.js
 OpenRouter
 
 MongoDB
+
 
 
 
