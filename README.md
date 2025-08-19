@@ -60,12 +60,12 @@ Backend:
 
 cd server
 npm start
+
 Frontend:
 
 cd client
 npm start
-📸 Screenshots
-(Add screenshots of your chat UI here)
+
 
 📄 License
 This project is licensed under the MIT License.
@@ -78,5 +78,6 @@ React.js
 OpenRouter
 
 MongoDB
+
 
 
